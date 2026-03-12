@@ -1,71 +1,71 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from scipy import stats
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QPS/QGS vs 4D-M Cardiac Parameters</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Sarabun', sans-serif; background-color: #f8f9fa; color: #333; margin: 0; padding: 20px; text-align: center; }
+        h1 { color: #2c3e50; }
+        .container { max-width: 900px; margin: auto; }
+        .chart-wrapper { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 30px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 ผลการเปรียบเทียบพารามิเตอร์หัวใจ (QPS/QGS vs 4D-M)</h1>
+        <p>สร้างจากข้อมูลวิจัย: การเปรียบเทียบค่าพารามิเตอร์การทำงานของหัวใจ</p>
 
-# -----------------------------------------
-# 1. โหลดข้อมูล (นำเข้าข้อมูลจริงของคุณที่นี่)
-# ตัวอย่าง: df = pd.read_csv('cardiac_data.csv')
-# -----------------------------------------
-# สร้าง Mock Data ให้คล้ายคลึงกับผลลัพธ์จากบทที่ 4 
-np.random.seed(42)
-qgs_edv = np.random.normal(67, 20, 147)
-# 4DM มักจะสูงกว่า QGS ตามสมการทำนาย: 4DM = (1.18 * QGS) + 6.27
-dm4_edv = (1.18 * qgs_edv) + 6.27 + np.random.normal(0, 5, 147)
+        <div class="chart-wrapper">
+            <canvas id="volumeChart"></canvas>
+        </div>
 
-df = pd.DataFrame({'QGS_Rest_EDV': qgs_edv, '4DM_Rest_EDV': dm4_edv})
+        <div class="chart-wrapper">
+            <canvas id="lvefChart"></canvas>
+        </div>
+    </div>
 
-# -----------------------------------------
-# 2. ตั้งค่าธีมสำหรับ Visualization
-# -----------------------------------------
-sns.set_theme(style="whitegrid", palette="muted")
-plt.rcParams.update({'font.size': 12, 'font.family': 'sans-serif'})
+    <script>
+        // ข้อมูลกราฟเปรียบเทียบปริมาตร (Median values)
+        const ctxVol = document.getElementById('volumeChart').getContext('2d');
+        new Chart(ctxVol, {
+            type: 'bar',
+            data: {
+                labels: ['Rest EDV (mL)', 'Stress EDV (mL)', 'Rest ESV (mL)', 'Stress ESV (mL)'],
+                datasets: [
+                    { label: 'QPS/QGS', data: [67.0, 67.0, 20.0, 22.0], backgroundColor: '#3498db' },
+                    { label: '4D-M', data: [83.0, 84.0, 25.0, 27.0], backgroundColor: '#e74c3c' }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'เปรียบเทียบค่าปริมาตรเชิงมัธยฐาน (EDV, ESV)', font: { size: 16 } }
+                }
+            }
+        });
 
-fig, axes = plt.subplots(1, 2, figsize=(16, 6))
-
-# ==========================================
-# กราฟซ้าย: Regression Scatter Plot (ดูความสัมพันธ์)
-# ==========================================
-ax1 = axes[0]
-sns.regplot(x='QGS_Rest_EDV', y='4DM_Rest_EDV', data=df, 
-            scatter_kws={'alpha': 0.6, 'color': '#1f77b4'}, 
-            line_kws={'color': '#d62728', 'lw': 2}, ax=ax1)
-
-# เพิ่มค่าสถิติลงในกราฟ
-rho, p_val = stats.spearmanr(df['QGS_Rest_EDV'], df['4DM_Rest_EDV'])
-textstr = f"Spearman's rho = {rho:.3f}\np < 0.001*"
-props = dict(boxstyle='round', facecolor='white', alpha=0.9, edgecolor='gray')
-ax1.text(0.05, 0.95, textstr, transform=ax1.transAxes, fontsize=12,
-         verticalalignment='top', bbox=props)
-
-ax1.set_title('Correlation of Rest EDV (QGS vs 4D-M)', fontsize=14, weight='bold')
-ax1.set_xlabel('QGS Rest EDV (mL)')
-ax1.set_ylabel('Corridor4DM Rest EDV (mL)')
-
-# ==========================================
-# กราฟขวา: Bland-Altman Plot (ดูความสอดคล้อง)
-# ==========================================
-ax2 = axes[1]
-mean_val = (df['QGS_Rest_EDV'] + df['4DM_Rest_EDV']) / 2
-diff_val = df['4DM_Rest_EDV'] - df['QGS_Rest_EDV']
-
-median_bias = np.median(diff_val)
-lower_loa = np.percentile(diff_val, 2.5)
-upper_loa = np.percentile(diff_val, 97.5)
-
-ax2.scatter(mean_val, diff_val, alpha=0.6, color='#2ca02c')
-
-# วาดเส้น Bias และ Limits of Agreement (LoA)
-ax2.axhline(median_bias, color='blue', linestyle='-', lw=2, label=f'Median Bias: {median_bias:.1f}')
-ax2.axhline(upper_loa, color='red', linestyle='--', lw=2, label=f'Upper 95% LoA: {upper_loa:.1f}')
-ax2.axhline(lower_loa, color='red', linestyle='--', lw=2, label=f'Lower 95% LoA: {lower_loa:.1f}')
-
-ax2.set_title('Bland-Altman Plot: Rest EDV Difference', fontsize=14, weight='bold')
-ax2.set_xlabel('Average of QGS and Corridor4DM (mL)')
-ax2.set_ylabel('Difference (Corridor4DM - QGS) (mL)')
-ax2.legend(loc='upper right')
-
-plt.tight_layout()
-plt.savefig('spect_comparison_plot.png', dpi=300)
-plt.show()
+        // ข้อมูลกราฟเปรียบเทียบประสิทธิภาพการบีบตัว (Mean values)
+        const ctxLvef = document.getElementById('lvefChart').getContext('2d');
+        new Chart(ctxLvef, {
+            type: 'bar',
+            data: {
+                labels: ['Rest LVEF (%)', 'Stress LVEF (%)'],
+                datasets: [
+                    { label: 'QPS/QGS', data: [66.67, 65.24], backgroundColor: '#2ecc71' },
+                    { label: '4D-M', data: [65.21, 65.16], backgroundColor: '#f39c12' }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: { display: true, text: 'เปรียบเทียบค่าประสิทธิภาพการบีบตัวเฉลี่ย (LVEF)', font: { size: 16 } }
+                },
+                scales: { y: { min: 40, max: 80 } }
+            }
+        });
+    </script>
+</body>
+</html>
