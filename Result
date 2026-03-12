@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presentation: QPS/QGS vs 4D-M in GS-MPI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Prompt', sans-serif; background-color: #f8fafc; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07); }
+    </style>
+</head>
+<body class="text-slate-800 antialiased selection:bg-blue-200">
+
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white py-16 px-6 text-center shadow-lg">
+        <h1 class="text-3xl md:text-5xl font-bold mb-4 drop-shadow-md">สรุปผลการวิจัย (บทที่ 4 และ 5)</h1>
+        <p class="text-lg md:text-xl font-light max-w-3xl mx-auto opacity-90">
+            การเปรียบเทียบค่าพารามิเตอร์การทำงานของหัวใจจากซอฟต์แวร์ QPS/QGS และ Corridor4DM<br>ในผู้ป่วยที่ได้รับการตรวจ Gated-SPECT Myocardial Perfusion Imaging
+        </p>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-12 space-y-12">
+
+        <section>
+            <h2 class="text-2xl font-bold text-blue-800 border-b-2 border-blue-200 pb-2 mb-6 flex items-center">
+                <span class="text-3xl mr-2">📊</span> บทที่ 4: ผลการทดลอง
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="glass-card rounded-2xl p-6 transition transform hover:-translate-y-1 hover:shadow-xl">
+                    <h3 class="text-xl font-semibold mb-4 text-indigo-700">การเปรียบเทียบพารามิเตอร์หลัก</h3>
+                    <ul class="space-y-3 text-slate-700">
+                        <li class="flex items-start">
+                            <span class="text-red-500 mr-2">📌</span>
+                            <p><strong>ปริมาตรหัวใจ (EDV, ESV):</strong> แตกต่างกันอย่างมีนัยสำคัญทางสถิติ (p &lt; 0.001) โดย <b>4D-M ประเมินค่าสูงกว่า QPS/QGS</b> ทั้งระยะพักและหลังกระตุ้น</p>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-2">📌</span>
+                            <p><strong>ประสิทธิภาพการบีบตัว (LVEF):</strong> <b>ไม่พบความแตกต่างอย่างมีนัยสำคัญ</b> (p = 0.093 ระยะพัก, p = 0.921 ระยะกระตุ้น) ทั้งสองโปรแกรมให้ผลลัพธ์ใกล้เคียงกัน</p>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-2">📌</span>
+                            <p><strong>คะแนนความผิดปกติ:</strong> QPS/QGS ให้ค่า SSS และ SDS สูงกว่า 4D-M เล็กน้อย ส่วน SRS และ TID Ratio ไม่พบความแตกต่าง</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 transition transform hover:-translate-y-1 hover:shadow-xl">
+                    <h3 class="text-xl font-semibold mb-4 text-indigo-700">ความสัมพันธ์และความสอดคล้อง</h3>
+                    <ul class="space-y-3 text-slate-700">
+                        <li class="flex items-start">
+                            <span class="text-purple-500 mr-2">📈</span>
+                            <p><strong>ความสัมพันธ์ (Correlation):</strong> ค่า EDV, ESV และ LVEF มีความสัมพันธ์เชิงบวกในระดับสูงมาก (r > 0.87)</p>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-orange-500 mr-2">⚖️</span>
+                            <p><strong>Bland-Altman Agreement:</strong> แม้ LVEF จะมี Mean Bias ใกล้ 0 แต่มี <b>Limits of Agreement (LoA) ค่อนข้างกว้าง</b> (-21.92% ถึง 19.01% ในระยะพัก) บ่งชี้ถึงความคลาดเคลื่อนในระดับรายบุคคล</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="mt-8 glass-card rounded-2xl p-6 overflow-x-auto">
+                <h3 class="text-xl font-semibold mb-4 text-indigo-700">ประสิทธิภาพแบบจำลองพยากรณ์ (Predicting 4D-M from QPS/QGS)</h3>
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-indigo-50 text-indigo-800">
+                            <th class="py-3 px-4 rounded-tl-lg font-semibold">Parameter</th>
+                            <th class="py-3 px-4 font-semibold">Correlation</th>
+                            <th class="py-3 px-4 font-semibold">R²</th>
+                            <th class="py-3 px-4 font-semibold">RMSE</th>
+                            <th class="py-3 px-4 rounded-tr-lg font-semibold">Equation</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 text-sm">
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4 font-medium">Rest EDV</td>
+                            <td class="py-3 px-4 text-green-600 font-semibold">0.961</td>
+                            <td class="py-3 px-4 font-bold text-blue-600">0.966</td>
+                            <td class="py-3 px-4">11.74</td>
+                            <td class="py-3 px-4 font-mono text-gray-600">4DM = (1.18 * QGS) + 6.27</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4 font-medium">Rest ESV</td>
+                            <td class="py-3 px-4 text-green-600 font-semibold">0.936</td>
+                            <td class="py-3 px-4 font-bold text-blue-600">0.964</td>
+                            <td class="py-3 px-4">9.28</td>
+                            <td class="py-3 px-4 font-mono text-gray-600">4DM = (1.02 * QGS) + 5.82</td>
+                        </tr>
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4 font-medium">Rest LVEF</td>
+                            <td class="py-3 px-4 text-green-600 font-semibold">0.874</td>
+                            <td class="py-3 px-4 font-bold text-blue-600">0.764</td>
+                            <td class="py-3 px-4">6.65</td>
+                            <td class="py-3 px-4 font-mono text-gray-600">4DM = (0.60 * QGS) + 25.29</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section>
+            <h2 class="text-2xl font-bold text-blue-800 border-b-2 border-blue-200 pb-2 mb-6 flex items-center">
+                <span class="text-3xl mr-2">💡</span> บทที่ 5: สรุปและวิจารณ์ผล
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white border-l-4 border-yellow-400 p-5 rounded-r-xl shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-lg mb-2 text-slate-800">ทำไมค่าถึงต่างกัน?</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">เกิดจากอัลกอริทึมของซอฟต์แวร์ เช่น 4D-M กำหนดระนาบลิ้นหัวใจตั้งฉากกับแกนยาว ทำให้ปริมาตรรวม LV outflow tract และการใช้แบบจำลองทางเรขาคณิตที่ต่างกัน (ทรงกระบอก vs ทรงรี)</p>
+                </div>
+
+                <div class="bg-white border-l-4 border-red-400 p-5 rounded-r-xl shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-lg mb-2 text-slate-800">ผลกระทบทางคลินิก</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">แม้จะมีความสัมพันธ์กันสูง แต่ค่ามีความคลาดเคลื่อน (โดยเฉพาะเมื่อเทียบกับ MRI ที่เป็น Gold Standard) <b>ไม่สามารถใช้ค่าจากซอฟต์แวร์ทั้งสองแทนกันได้โดยตรง (Not Interchangeable)</b></p>
+                </div>
+
+                <div class="bg-white border-l-4 border-green-400 p-5 rounded-r-xl shadow-sm hover:shadow-md transition">
+                    <h4 class="font-bold text-lg mb-2 text-slate-800">ข้อเสนอแนะ</h4>
+                    <p class="text-sm text-slate-600 leading-relaxed">ในการติดตามผลผู้ป่วย (Follow-up) <b>ควรใช้ซอฟต์แวร์ชนิดเดียวกันอย่างสม่ำเสมอ</b> เพื่อลดความคลาดเคลื่อนในการแปลผล</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-800 text-slate-400 text-center py-6 mt-8">
+        <p class="text-sm">นำเสนอผลงานวิจัยวิเคราะห์ภาพ Gated-SPECT MPI | คณะแพทยศาสตร์ มหาวิทยาลัยสงขลานครินทร์</p>
+    </footer>
+
+</body>
+</html>
